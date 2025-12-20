@@ -2,13 +2,13 @@
 #include <stdlib.h>
 
 /**
- * get_max_value - Find the maximum value in an array
- * @array: The array of integers
- * @size: Number of elements in array
+ * get_max - returns the maximum value in an array
+ * @array: array of ints
+ * @size: number of elements
  *
- * Return: The maximum value
+ * Return: max value
  */
-static int get_max_value(int *array, size_t size)
+static int get_max(int *array, size_t size)
 {
 	size_t i;
 	int max;
@@ -23,13 +23,13 @@ static int get_max_value(int *array, size_t size)
 }
 
 /**
- * build_count_prefix_print - Build counting array, prefix sums, then print it
- * @array: The array of integers
- * @size: Number of elements in array
- * @count: Counting array (size k + 1)
- * @k: Maximum value in array
+ * build_count - builds count array and prefix sums, then prints it
+ * @array: array of ints
+ * @size: number of elements
+ * @count: count array
+ * @k: maximum value
  */
-static void build_count_prefix_print(int *array, size_t size, int *count, int k)
+static void build_count(int *array, size_t size, int *count, int k)
 {
 	size_t i;
 	int j;
@@ -47,13 +47,13 @@ static void build_count_prefix_print(int *array, size_t size, int *count, int k)
 }
 
 /**
- * fill_output_and_copy - Fill output array (stable) then copy back to array
- * @array: The original array
- * @size: Number of elements
- * @count: Counting array with prefix sums
- * @output: Output array
+ * fill_output - fills output array using prefix sums, then copies back
+ * @array: original array
+ * @size: number of elements
+ * @count: prefix sums array
+ * @output: output array
  */
-static void fill_output_and_copy(int *array, size_t size, int *count, int *output)
+static void fill_output(int *array, size_t size, int *count, int *output)
 {
 	ssize_t i;
 	int v;
@@ -71,9 +71,9 @@ static void fill_output_and_copy(int *array, size_t size, int *count, int *outpu
 }
 
 /**
- * counting_sort - Sorts an array of integers in ascending order using Counting sort
- * @array: The array of integers
- * @size: Number of elements in array
+ * counting_sort - sorts an array of ints in ascending order (Counting sort)
+ * @array: array of ints
+ * @size: number of elements
  */
 void counting_sort(int *array, size_t size)
 {
@@ -83,7 +83,7 @@ void counting_sort(int *array, size_t size)
 	if (array == NULL || size < 2)
 		return;
 
-	k = get_max_value(array, size);
+	k = get_max(array, size);
 
 	count = malloc(sizeof(int) * (k + 1));
 	if (count == NULL)
@@ -96,8 +96,8 @@ void counting_sort(int *array, size_t size)
 		return;
 	}
 
-	build_count_prefix_print(array, size, count, k);
-	fill_output_and_copy(array, size, count, output);
+	build_count(array, size, count, k);
+	fill_output(array, size, count, output);
 
 	free(output);
 	free(count);
