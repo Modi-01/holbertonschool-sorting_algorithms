@@ -1,9 +1,9 @@
 #include "sort.h"
 
 /**
- * swap_forward - Swap a node with its next node
- * @list: Pointer to head pointer
- * @node: Node to swap forward
+ * swap_forward - swaps a node with its next node
+ * @list: pointer to the head pointer
+ * @node: node to swap forward
  */
 static void swap_forward(listint_t **list, listint_t *node)
 {
@@ -29,9 +29,9 @@ static void swap_forward(listint_t **list, listint_t *node)
 }
 
 /**
- * swap_backward - Swap a node with its previous node
- * @list: Pointer to head pointer
- * @node: Node to swap backward
+ * swap_backward - swaps a node with its previous node
+ * @list: pointer to the head pointer
+ * @node: node to swap backward
  */
 static void swap_backward(listint_t **list, listint_t *node)
 {
@@ -57,8 +57,8 @@ static void swap_backward(listint_t **list, listint_t *node)
 }
 
 /**
- * cocktail_sort_list - Sorts a doubly linked list using Cocktail shaker sort
- * @list: Pointer to head pointer of the list
+ * cocktail_sort_list - sorts a doubly linked list using cocktail shaker sort
+ * @list: pointer to the head pointer of the list
  */
 void cocktail_sort_list(listint_t **list)
 {
@@ -68,13 +68,18 @@ void cocktail_sort_list(listint_t **list)
 	if (list == NULL || *list == NULL || (*list)->next == NULL)
 		return;
 
+	/* Ensure *list starts at real head */
+	while ((*list)->prev != NULL)
+		*list = (*list)->prev;
+
 	start = *list;
 	end = NULL;
-	swapped = 1;
 
-	while (swapped)
-	{
+	do {
 		swapped = 0;
+
+		/* Always re-anchor start at current head */
+		start = *list;
 		current = start;
 
 		/* Forward pass */
@@ -108,6 +113,5 @@ void cocktail_sort_list(listint_t **list)
 			}
 			current = current->prev;
 		}
-		start = current;
-	}
+	} while (swapped);
 }
