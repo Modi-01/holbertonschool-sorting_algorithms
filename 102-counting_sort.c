@@ -2,11 +2,11 @@
 #include <stdlib.h>
 
 /**
- * get_max_value - finds the maximum value in an array
- * @array: array of integers
- * @size: number of elements in array
+ * get_max_value - Find the maximum value in an array
+ * @array: The array of integers
+ * @size: Number of elements in array
  *
- * Return: maximum value
+ * Return: The maximum value
  */
 static int get_max_value(int *array, size_t size)
 {
@@ -23,77 +23,57 @@ static int get_max_value(int *array, size_t size)
 }
 
 /**
- * build_count_array - builds the counting array (frequency)
- * @array: array of integers
- * @size: number of elements in array
- * @count: counting array
- * @k: maximum value in array
+ * build_count_prefix_print - Build counting array, prefix sums, then print it
+ * @array: The array of integers
+ * @size: Number of elements in array
+ * @count: Counting array (size k + 1)
+ * @k: Maximum value in array
  */
-static void build_count_array(int *array, size_t size, int *count, int k)
+static void build_count_prefix_print(int *array, size_t size, int *count, int k)
 {
 	size_t i;
+	int j;
 
 	for (i = 0; i < (size_t)(k + 1); i++)
 		count[i] = 0;
 
 	for (i = 0; i < size; i++)
 		count[array[i]] += 1;
-}
 
-/**
- * prefix_sum_and_print - converts count array to prefix sums and prints it
- * @count: counting array
- * @k: maximum value in array
- */
-static void prefix_sum_and_print(int *count, int k)
-{
-	int i;
-
-	for (i = 1; i <= k; i++)
-		count[i] += count[i - 1];
+	for (j = 1; j <= k; j++)
+		count[j] += count[j - 1];
 
 	print_array(count, (size_t)(k + 1));
 }
 
 /**
- * build_output - builds the sorted output array using counting array
- * @array: input array
- * @size: number of elements
- * @count: counting array (prefix sums)
- * @output: output array
+ * fill_output_and_copy - Fill output array (stable) then copy back to array
+ * @array: The original array
+ * @size: Number of elements
+ * @count: Counting array with prefix sums
+ * @output: Output array
  */
-static void build_output(int *array, size_t size, int *count, int *output)
+static void fill_output_and_copy(int *array, size_t size, int *count, int *output)
 {
 	ssize_t i;
-	int value, pos;
+	int v;
+	size_t j;
 
 	for (i = (ssize_t)size - 1; i >= 0; i--)
 	{
-		value = array[i];
-		pos = count[value] - 1;
-		output[pos] = value;
-		count[value] -= 1;
+		v = array[i];
+		output[count[v] - 1] = v;
+		count[v] -= 1;
 	}
+
+	for (j = 0; j < size; j++)
+		array[j] = output[j];
 }
 
 /**
- * copy_back - copies output array back into original array
- * @array: original array
- * @output: sorted output array
- * @size: number of elements
- */
-static void copy_back(int *array, int *output, size_t size)
-{
-	size_t i;
-
-	for (i = 0; i < size; i++)
-		array[i] = output[i];
-}
-
-/**
- * counting_sort - sorts an array of integers in ascending order using Counting sort
- * @array: array of integers
- * @size: number of elements in array
+ * counting_sort - Sorts an array of integers in ascending order using Counting sort
+ * @array: The array of integers
+ * @size: Number of elements in array
  */
 void counting_sort(int *array, size_t size)
 {
@@ -116,10 +96,8 @@ void counting_sort(int *array, size_t size)
 		return;
 	}
 
-	build_count_array(array, size, count, k);
-	prefix_sum_and_print(count, k);
-	build_output(array, size, count, output);
-	copy_back(array, output, size);
+	build_count_prefix_print(array, size, count, k);
+	fill_output_and_copy(array, size, count, output);
 
 	free(output);
 	free(count);
