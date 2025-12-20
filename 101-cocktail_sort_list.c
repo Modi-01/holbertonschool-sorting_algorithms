@@ -1,9 +1,9 @@
 #include "sort.h"
 
 /**
- * swap_forward - Swaps a node with its next node (move node forward)
- * @list: Pointer to the head pointer
- * @node: Node to swap with its next
+ * swap_forward - Swap a node with its next node
+ * @list: Pointer to head pointer
+ * @node: Node to swap forward
  */
 static void swap_forward(listint_t **list, listint_t *node)
 {
@@ -29,9 +29,9 @@ static void swap_forward(listint_t **list, listint_t *node)
 }
 
 /**
- * swap_backward - Swaps a node with its previous node (move node backward)
- * @list: Pointer to the head pointer
- * @node: Node to swap with its previous
+ * swap_backward - Swap a node with its previous node
+ * @list: Pointer to head pointer
+ * @node: Node to swap backward
  */
 static void swap_backward(listint_t **list, listint_t *node)
 {
@@ -57,13 +57,12 @@ static void swap_backward(listint_t **list, listint_t *node)
 }
 
 /**
- * cocktail_sort_list - Sorts a doubly linked list of integers in ascending
- *                      order using the Cocktail shaker sort algorithm
- * @list: Pointer to the head pointer of the list
+ * cocktail_sort_list - Sorts a doubly linked list using Cocktail shaker sort
+ * @list: Pointer to head pointer of the list
  */
 void cocktail_sort_list(listint_t **list)
 {
-	listint_t *end, *start, *current;
+	listint_t *start, *end, *current;
 	int swapped;
 
 	if (list == NULL || *list == NULL || (*list)->next == NULL)
@@ -71,11 +70,14 @@ void cocktail_sort_list(listint_t **list)
 
 	start = *list;
 	end = NULL;
+	swapped = 1;
 
-	do {
+	while (swapped)
+	{
 		swapped = 0;
 		current = start;
 
+		/* Forward pass */
 		while (current->next != end)
 		{
 			if (current->n > current->next->n)
@@ -93,9 +95,9 @@ void cocktail_sort_list(listint_t **list)
 			break;
 
 		swapped = 0;
-		current = end;
 
-		while (current->prev != start->prev)
+		/* Backward pass */
+		while (current->prev != NULL && current != start)
 		{
 			if (current->n < current->prev->n)
 			{
@@ -107,5 +109,5 @@ void cocktail_sort_list(listint_t **list)
 			current = current->prev;
 		}
 		start = current;
-	} while (swapped);
+	}
 }
