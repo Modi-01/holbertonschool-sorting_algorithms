@@ -1,18 +1,20 @@
 #include "sort.h"
 
 /**
- * swap_adjacent - Swap two adjacent nodes in a doubly linked list
+ * swap_adjacent - Swap a node with its next node in a doubly linked list
  * @list: Pointer to the head pointer of the list
- * @left: The left node (must be right->prev)
- * @right: The right node (must be left->next)
+ * @left: Pointer to the left node (must have a next node)
+ *
+ * Return: Pointer to the node that ends up in the left position after swap
  */
-static void swap_adjacent(listint_t **list, listint_t *left, listint_t *right)
+static listint_t *swap_adjacent(listint_t **list, listint_t *left)
 {
-	if (list == NULL || *list == NULL || left == NULL || right == NULL)
-		return;
+	listint_t *right;
 
-	if (left->next != right || right->prev != left)
-		return;
+	if (list == NULL || *list == NULL || left == NULL || left->next == NULL)
+		return (NULL);
+
+	right = left->next;
 
 	left->next = right->next;
 	if (right->next != NULL)
@@ -26,69 +28,75 @@ static void swap_adjacent(listint_t **list, listint_t *left, listint_t *right)
 
 	right->next = left;
 	left->prev = right;
+
+	return (right);
 }
 
 /**
- * cocktail_sort_list - Sort a doubly linked list using Cocktail Shaker sort
+ * cocktail_sort_list - Sort a doubly linked list using Cocktail shaker sort
  * @list: Pointer to the head pointer of the list
  */
 void cocktail_sort_list(listint_t **list)
 {
-	listint_t *cur, *start, *end, *start_prev;
-	int swapped;
+	int swapped = 1;
+	listint_t *end = NULL, *start = NULL;
+	listint_t *curr;
 
 	if (list == NULL || *list == NULL || (*list)->next == NULL)
 		return;
 
-	while ((*list)->prev != NULL)
-		*list = (*list)->prev;
-
 	start = *list;
-	end = NULL;
 
-	while (1)
+	while (swapped)
 	{
 		swapped = 0;
-		cur = start;
+		curr = start;
 
-		while (cur->next != end)
+		/* Forward pass */
+		while (curr->next != end)
 		{
-			if (cur->n > cur->next->n)
+			if (curr->n > curr->next->n)
 			{
-				swap_adjacent(list, cur, cur->next);
+				swap_adjacent(list, curr);
 				print_list(*list);
 				swapped = 1;
-				if (cur->prev != NULL)
-					cur = cur->prev;
+
+				/*
+				 * After swapping curr with curr->next,
+				 * curr is now after the smaller node.
+				 * Keep curr where it is (do not advance) to compare again.
+				 */
 				continue;
 			}
-			cur = cur->next;
+			curr = curr->next;
 		}
-		end = cur;
+		end = curr;
 
 		if (!swapped)
 			break;
 
 		swapped = 0;
-		start_prev = start->prev;
-		cur = end;
 
-		while (cur->prev != start_prev)
+		/* Backward pass */
+		while (curr->prev != start->prev)
 		{
-			if (cur->prev->n > cur->n)
+			if (curr->prev != NULL && curr->prev->n > curr->n)
 			{
-				swap_adjacent(list, cur->prev, cur);
+				/*
+				 * To swap (curr->prev) with curr, pass curr->prev
+				 */
+				swap_adjacent(list, curr->prev);
 				print_list(*list);
 				swapped = 1;
-				if (cur->next != NULL)
-					cur = cur->next;
+
+				/*
+				 * After swapping, curr moved one step left.
+				 * Keep curr where it is to continue moving backward.
+				 */
 				continue;
 			}
-			cur = cur->prev;
+			curr = curr->prev;
 		}
-		start = cur;
-
-		if (!swapped)
-			break;
+		start = curr;
 	}
 }
