@@ -1,59 +1,31 @@
 #include "sort.h"
 
 /**
- * swap_forward - Swap a node with its next node
- * @list: Pointer to the head pointer
- * @node: Node to move forward
+ * swap_adjacent - Swap two adjacent nodes in a doubly linked list
+ * @list: Pointer to the head pointer of the list
+ * @left: The left node (must be right->prev)
+ * @right: The right node (must be left->next)
  */
-static void swap_forward(listint_t **list, listint_t *node)
+static void swap_adjacent(listint_t **list, listint_t *left, listint_t *right)
 {
-	listint_t *next;
-
-	if (list == NULL || *list == NULL || node == NULL || node->next == NULL)
+	if (list == NULL || *list == NULL || left == NULL || right == NULL)
 		return;
 
-	next = node->next;
-
-	node->next = next->next;
-	if (next->next != NULL)
-		next->next->prev = node;
-
-	next->prev = node->prev;
-	if (node->prev != NULL)
-		node->prev->next = next;
-	else
-		*list = next;
-
-	next->next = node;
-	node->prev = next;
-}
-
-/**
- * swap_backward - Swap a node with its previous node
- * @list: Pointer to the head pointer
- * @node: Node to move backward
- */
-static void swap_backward(listint_t **list, listint_t *node)
-{
-	listint_t *prev;
-
-	if (list == NULL || *list == NULL || node == NULL || node->prev == NULL)
+	if (left->next != right || right->prev != left)
 		return;
 
-	prev = node->prev;
+	left->next = right->next;
+	if (right->next != NULL)
+		right->next->prev = left;
 
-	prev->next = node->next;
-	if (node->next != NULL)
-		node->next->prev = prev;
-
-	node->prev = prev->prev;
-	if (prev->prev != NULL)
-		prev->prev->next = node;
+	right->prev = left->prev;
+	if (left->prev != NULL)
+		left->prev->next = right;
 	else
-		*list = node;
+		*list = right;
 
-	node->next = prev;
-	prev->prev = node;
+	right->next = left;
+	left->prev = right;
 }
 
 /**
@@ -62,8 +34,8 @@ static void swap_backward(listint_t **list, listint_t *node)
  */
 void cocktail_sort_list(listint_t **list)
 {
-	listint_t *start, *end, *current;
-	int swapped, swapped_fwd, swapped_bwd;
+	listint_t *cur, *start, *end, *start_prev;
+	int swapped;
 
 	if (list == NULL || *list == NULL || (*list)->next == NULL)
 		return;
@@ -74,38 +46,49 @@ void cocktail_sort_list(listint_t **list)
 	start = *list;
 	end = NULL;
 
-	do {
-		swapped_fwd = 0;
-		current = start;
+	while (1)
+	{
+		swapped = 0;
+		cur = start;
 
-		while (current->next != end)
+		while (cur->next != end)
 		{
-			if (current->n > current->next->n)
+			if (cur->n > cur->next->n)
 			{
-				swap_forward(list, current);
+				swap_adjacent(list, cur, cur->next);
 				print_list(*list);
-				swapped_fwd = 1;
+				swapped = 1;
+				if (cur->prev != NULL)
+					cur = cur->prev;
 				continue;
 			}
-			current = current->next;
+			cur = cur->next;
 		}
-		end = current;
+		end = cur;
 
-		swapped_bwd = 0;
+		if (!swapped)
+			break;
 
-		while (current->prev != NULL && current != start)
+		swapped = 0;
+		start_prev = start->prev;
+		cur = end;
+
+		while (cur->prev != start_prev)
 		{
-			if (current->n < current->prev->n)
+			if (cur->prev->n > cur->n)
 			{
-				swap_backward(list, current);
+				swap_adjacent(list, cur->prev, cur);
 				print_list(*list);
-				swapped_bwd = 1;
+				swapped = 1;
+				if (cur->next != NULL)
+					cur = cur->next;
 				continue;
 			}
-			current = current->prev;
+			cur = cur->prev;
 		}
-		start = current;
+		start = cur;
 
-		swapped = swapped_fwd || swapped_bwd;
-	} while (swapped);
+		if (!swapped)
+			break;
+	}
 }
